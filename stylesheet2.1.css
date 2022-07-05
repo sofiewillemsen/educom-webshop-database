@@ -1,0 +1,58 @@
+
+body {
+  width: 800px; /* JH: Stel je editor zo dat <TAB> wordt omgezet in spaties */
+  margin: auto;
+  color: grey;
+}
+
+p {
+  font-size: 12px;
+}
+
+
+header {
+  text-align: center;
+  background-color: lightpink;
+  height: 48px;
+}
+
+
+.nav a:link { 
+  text-decoration: none;
+  background-color: powderblue;
+  color: white;
+}
+
+.nav a:visited { 
+  text-decoration: none;
+  background-color: powderblue;
+  color: white;
+}
+
+ul.nav {
+  list-style-type: none;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}
+
+.nav li {
+  display: inline-block;
+  border: solid;
+  border-width: 1px
+}
+
+input {
+	width: 400px;
+}
+
+input[type='button'] {
+	width: auto;
+}
+
+footer {
+  background-color: black;
+  color: white;
+  font-size: 10px;
+  text-align: right;
+}
