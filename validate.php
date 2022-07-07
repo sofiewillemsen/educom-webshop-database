@@ -73,47 +73,50 @@ function checkFields(array $arr_fieldinfo) : array
 
 function findUserByEmail(){
 
+  $servername = "localhost";
+  $username = "sofie";
+  $password = "UOIa(27t3rzexDM@";
+  $dbname = "sofies_webshop";
+
   $email = $_POST['email'];
-  $password = $_POST['password'];
-  $userFile = fopen("/Applications/XAMPP/xamppfiles/htdocs/opdracht_2.1/users.txt", "r");
 
-  try {
-    while (!feof($userFile)) {
-      $str = fgets($userFile);
-      $explosion = explode('|', $str, 3);
+// Create connection
+$conn = mysqli_connect($servername, $username, $password, $dbname);
+// Check connection
+if (!$conn) {
+  die("Connection failed: " . mysqli_connect_error());
+}
 
+$sql = "SELECT name, email, password FROM users WHERE email='".$email."'";
+$result = mysqli_query($conn, $sql);
 
-      if(count($explosion) !=3){
-        throw new Exception("Userfile is corrupt");
-      }
-      if ($email == $explosion[1]){
-        return array("name" => trim($explosion[0]), "email" => trim($explosion[1]), "password" => trim($explosion[2]));
-      }
-    }
-        return false;
-
-  }catch(Exception $e) {  
-      echo "Userfile is corrupt.";
+if (mysqli_num_rows($result) > 0) {
+  // output data of each row
+  while($row = mysqli_fetch_assoc($result)) {
+    $user['name'] = $row['name'];
+    $user ['password'] = $row['password'];
+    $user['email'] = $row['email'];
   }
-  finally{
-      fclose($userFile);
-  }
+  }else{
+    $user = NULL;
+} 
+return $user;
+mysqli_close($conn);
 
-  return $user;
 }
 
 
 function authenticateUser($email, $password){
  $email = $_POST['email'];
- $user = findUserByEmail($email);
+ $user = findUserByEmail();
  $password = $_POST['password'];
 
  if ($user == null) {
   return false;
  }
-if ($user['password']!== $password) {
+ if ($user['password']!== $password) {
   return false;
-}
+ }
 
 return $user;
 
@@ -121,9 +124,9 @@ return $user;
 
 function checkRegisterUsers(){
   $email = $_POST['email'];
-  $file_content = file_get_contents('/Applications/XAMPP/xamppfiles/htdocs/opdracht_2.1/users.txt');
+  $user = findUserByEmailSQL();
     
-    if (strpos($file_content, $email) == true) {
+    if (isset($user)) {
       return false;
     }
     return true;

@@ -75,6 +75,29 @@ function processRequest($page){
        $_SESSION["user_name"] = NULL;
        $page = 'home';
       break;
+
+      case 'changepassword';
+      require_once('changepassword.php');
+      $result['arr_fieldinfo'] = getChangePasswordFields();
+      if ($_SERVER['REQUEST_METHOD']=='POST'){
+         require_once('validate.php');
+         $result = checkFields($result['arr_fieldinfo']);
+         $authenticatedUser = authenticateUser($result['email'], $result['password']);
+         if ($result['ok']){
+            if (findUserByEmail(['email']) ==  false){
+               $result['email_err'] = 'Email niet bekend.';
+            }
+            elseif ($authenticatedUser == false) {
+               $result['password_err'] = 'Voer het juiste wachtwoord in.';
+            }
+            elseif (checkNewPassword() == false){
+               $result['newpassword_err'] = 'Wachtwoorden zijn niet hetzelfde';
+            }else{
+             changePassword();
+             $page = 'home';
+           }
+         }
+      }
    }
 
    $result['page'] = $page;
@@ -117,6 +140,13 @@ function showContent($result)
           require_once('forms.php');
           require_once('validate.php');
           showRegisterHeading();
+          showForm($result);
+          break;
+       case 'changepassword':
+          require_once('changepassword.php');
+          require_once('forms.php');
+          require_once('validate.php');
+          showChangePasswordHeading();
           showForm($result);
           break;
    }     
@@ -216,7 +246,8 @@ $menuItemsLogin = array('home', 'about', 'contact');
       foreach ($menuItemsLogin as $value){
       echo '<li><a href="index.php?page='.$value.'">'.$value.'</a></li>';
       }
-      echo '<li><a href="index.php?page=logout"> Logout '.$_SESSION["user_name"].' </a></li>';
+      echo '<li><a href="index.php?page=logout"> Logout '.$_SESSION["user_name"].' </a></li>
+            <li><a href="index.php?page=changepassword"> Wachtwoord veranderen </a></li>';
 
    }else{
 

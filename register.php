@@ -9,9 +9,27 @@ function showRegisterHeading()
 
 
 function writeUser(){
-  $usersFile = fopen("/Applications/XAMPP/xamppfiles/htdocs/opdracht_2.1/users.txt", "a") or die("Unable to open file!"); 
-  $userRegister = PHP_EOL. '[naam]|[email]|[wachtwoord]'.PHP_EOL. $_POST['naam'].'|'.$_POST['email'].'|'.$_POST['password'];
-  fwrite($usersFile, $userRegister);
+
+  $servername = "localhost";
+  $username = "sofie";
+  $password = "UOIa(27t3rzexDM@";
+  $dbname = "sofies_webshop";
+
+  $name = $_POST['naam'];
+  $email = $_POST['email'];
+  $pword = $_POST['password'];
+
+
+  $conn = new mysqli($servername, $username, $password, $dbname);
+
+  $sql = "INSERT INTO users (name, email, password)
+    VALUES ('".$name."', '".$email."', '".$pword."')";
+
+  if ($conn->query($sql) === FALSE) {
+      echo "Error: " . $sql . "<br>" . $conn->error;
+    }
+
+$conn->close();
 }
 
 function getRegisterFields(){
