@@ -5,8 +5,7 @@ session_start();
 $page = getRequestedPage(); 
 $data = processRequest($page);
 showResponsePage($data); 
-
-var_dump($data, $page);
+var_dump($data);
 
 function processRequest($page){
 
@@ -70,13 +69,13 @@ function processRequest($page){
       }
        break;
 
-      case 'logout';
+      case "logout":
        session_destroy();
        $_SESSION["user_name"] = NULL;
        $page = 'home';
       break;
 
-      case 'changepassword';
+      case "changepassword":
       require_once('changepassword.php');
       $result['arr_fieldinfo'] = getChangePasswordFields();
       if ($_SERVER['REQUEST_METHOD']=='POST'){
@@ -98,6 +97,17 @@ function processRequest($page){
            }
          }
       }
+      break;
+
+      case "detail":
+      $page = 'detail';
+      if ($_SERVER['REQUEST_METHOD']=='POST'){
+         require_once('detail.php');
+         addToCart();
+         var_dump($_SESSION['item']);
+      }
+      break;
+   
    }
 
    $result['page'] = $page;
@@ -149,6 +159,21 @@ function showContent($result)
           showChangePasswordHeading();
           showForm($result);
           break;
+       case 'webshop':
+          require_once('webshop.php');
+          showWebshopHeading();
+          showProducts();
+          break;
+       case 'detail':
+         require_once('detail.php');
+         $id = $_GET['id'];
+         showItem($id);
+         break;
+       case 'cart':
+         require_once('cart.php');
+         showCartHeading();
+         showCart();
+         break;
    }     
 } 
 
@@ -174,8 +199,6 @@ function checkSession()
 
 function showResponsePage($data) 
 { 
-   var_dump($data);
-
    beginDocument(); 
    showHeadSection(); 
    showBodySection($data); 
@@ -222,7 +245,6 @@ function showHeader()
 
 function showBodySection($data) 
 { 
-var_dump($data);
 
    echo '    <body>' . PHP_EOL; 
    showHeader();
@@ -235,8 +257,8 @@ var_dump($data);
 
 
 function showMenu(){
-$menuItems = array('home', 'about', 'contact', 'register', 'login');
-$menuItemsLogin = array('home', 'about', 'contact');
+$menuItems = array('home', 'about', 'contact', 'register', 'login', 'webshop', 'cart');
+$menuItemsLogin = array('home', 'about', 'contact', 'webshop', 'cart');
 
    echo '<p>
    <ul class="nav">';
