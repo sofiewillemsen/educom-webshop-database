@@ -87,12 +87,13 @@ if (!$conn) {
   die("Connection failed: " . mysqli_connect_error());
 }
 
-$sql = "SELECT name, email, password FROM users WHERE email='".$email."'";
+$sql = "SELECT id, name, email, password FROM users WHERE email='".$email."'";
 $result = mysqli_query($conn, $sql);
 
 if (mysqli_num_rows($result) > 0) {
   // output data of each row
   while($row = mysqli_fetch_assoc($result)) {
+    $user['id'] = $row['id'];
     $user['name'] = $row['name'];
     $user ['password'] = $row['password'];
     $user['email'] = $row['email'];
@@ -124,7 +125,7 @@ return $user;
 
 function checkRegisterUsers(){
   $email = $_POST['email'];
-  $user = findUserByEmailSQL();
+  $user = findUserByEmail();
     
     if (isset($user)) {
       return false;

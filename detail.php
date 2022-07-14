@@ -1,48 +1,57 @@
 <?php
 
-function showItem($item){
+/* Laat het aangeklikte product met
+koopbutton afhankelijk van login*/
+
+function showProduct($product){
     require_once('webshop.php');
     $products = getProducts();
     
     $id = $_GET['id'];
     var_dump($id);
     
-    $item = $products[$id];
+    $product = $products[$id];
 
     echo '<h1>'
-      .$item['name']
+      .$product['name']
       .'
       </h1>
       <p>
       <img src="/educom-webshop-database/Images/'
-      .$item['picture']
+      .$product['picture']
       .'" alt="'
-      .$item['picture']
+      .$product['picture']
       .'" style="width:300px;height:380px;">
       </p>
       
       <p>'
-      .$item['description']
+      .$product['description']
       .'</p>
       
       <p>€'
-      .$item['price']
+      .$product['price']
       .',-';
       
       if (checkSession()){
-        echo '<p><form method="post" action="index.php">
-        <button type="submit" value="submit">Koop</button>
-        </form></p>';
+        require_once('forms.php');
+        openForm('detail','');
+        echo '<input type="hidden" name="id" value="'.$product['id'].'">';
+        closeForm($submit_caption="Koop");
       }else{
        echo '<p><a href="index.php?page=login">Log in</a> om te bestellen.</p>';
    }
+   var_dump($product);
 }
 
+// Voeg product toe aan de cart
+
 function addToCart(){
+    require_once('webshop.php');
     $products = getProducts();
-    $id = $_GET['id']; 
-    $item = $products['id'];
-    $_SESSION['item'] = $item;
+    $id = $_POST['id'];
+    $product = $products[$id];
+    $_SESSION['cart_products'][$id] = $product;
+    var_dump($_SESSION['cart_products']);
 }
 
 ?>

@@ -1,11 +1,15 @@
 <?php
 error_reporting(E_ALL);
 
+// Start een sessie
+
 session_start();
+
 $page = getRequestedPage(); 
 $data = processRequest($page);
 showResponsePage($data); 
-var_dump($data);
+
+// Verwerk de acties van elke afzonderlijke pagina
 
 function processRequest($page){
 
@@ -40,6 +44,7 @@ function processRequest($page){
                $result['password_err'] = 'Voer het juiste wachtwoord in.';
             }else{
              $_SESSION["user_name"] = $authenticatedUser['name'];
+             $_SESSION['userid'] = $authenticatedUser['id'];
              $page = 'home';
            }
          }
@@ -74,7 +79,7 @@ function processRequest($page){
        $_SESSION["user_name"] = NULL;
        $page = 'home';
       break;
-
+      
       case "changepassword":
       require_once('changepassword.php');
       $result['arr_fieldinfo'] = getChangePasswordFields();
@@ -93,27 +98,44 @@ function processRequest($page){
                $result['newpassword_err'] = 'Wachtwoorden zijn niet hetzelfde';
             }else{
              changePassword();
-             $page = 'home';
+             $page = 'login';
            }
          }
       }
       break;
+      
+      case "webshop":
+         require_once('detail.php');
+         if ($_SERVER['REQUEST_METHOD']=='POST'){
+           addToCart();
+           $page = 'cart';
+         }
+      break;
 
       case "detail":
-      $page = 'detail';
-      if ($_SERVER['REQUEST_METHOD']=='POST'){
          require_once('detail.php');
-         addToCart();
-         var_dump($_SESSION['item']);
-      }
+         if ($_SERVER['REQUEST_METHOD']=='POST'){
+           addToCart();
+           $page = 'cart';
+         }
       break;
-   
+
+      case "cart":
+         require_once('cart.php');
+         if ($_SERVER['REQUEST_METHOD']=='POST'){
+            writeToOrders();
+            writeToOrdersRegel();
+            $_SESSION['cart_products'] = NULL;
+            $page = 'cart';
+          }
+          break;
    }
 
    $result['page'] = $page;
    return $result;
 }
 
+// Laat de content zien afhankelijk van de pagina
 
 function showContent($result) 
 { 
@@ -167,7 +189,7 @@ function showContent($result)
        case 'detail':
          require_once('detail.php');
          $id = $_GET['id'];
-         showItem($id);
+         showProduct($id);
          break;
        case 'cart':
          require_once('cart.php');
@@ -177,12 +199,15 @@ function showContent($result)
    }     
 } 
 
+// Verwerk of het een POST of GET pagina is
+
 function getRequestedPage() 
 {     
    $requested_type = $_SERVER['REQUEST_METHOD']; 
    if ($requested_type == 'POST') 
    { 
        $requested_page = getPostVar('page','home'); 
+       var_dump($requested_page);
    } 
    else 
    { 
@@ -190,21 +215,6 @@ function getRequestedPage()
    } 
    return $requested_page; 
 } 
-
-function checkSession()
-{
-   return isset($_SESSION["user_name"]);
-}
-
-
-function showResponsePage($data) 
-{ 
-   beginDocument(); 
-   showHeadSection(); 
-   showBodySection($data); 
-   endDocument(); 
-}     
-
 
 function getArrayVar($array, $key, $default='') 
 { 
@@ -223,11 +233,29 @@ function getUrlVar($key, $default='')
     return getArrayVar($_GET, $key, $default);
 } 
 
+function checkSession()
+{
+   return isset($_SESSION["user_name"]);
+}
+
+// Laat de pagina zien
+
+function showResponsePage($data) 
+{ 
+   beginDocument(); 
+   showHeadSection(); 
+   showBodySection($data); 
+   endDocument(); 
+}     
+
+// Begin HTML
 
 function beginDocument() 
 { 
    echo '<!DOCTYPE html><html>'; 
 } 
+
+// Laat de head sectie zien
 
 function showHeadSection() 
 { 
@@ -237,11 +265,14 @@ function showHeadSection()
 </head>';
 } 
 
+// Toon de titel van de webpagina
+
 function showHeader() 
 { 
-   echo "<header> <h1> Sofies space </h1> </header>";
+   echo "<header><h1><br>Sofie's Webshop </h1> </header>";
 } 
 
+// Laat het body gedeelte van de pagina zien
 
 function showBodySection($data) 
 { 
@@ -254,10 +285,10 @@ function showBodySection($data)
    echo '    </body>' . PHP_EOL; 
 } 
 
-
+// Toon het menu, afhankelijk van login
 
 function showMenu(){
-$menuItems = array('home', 'about', 'contact', 'register', 'login', 'webshop', 'cart');
+$menuItems = array('home', 'about', 'contact', 'register', 'login', 'webshop');
 $menuItemsLogin = array('home', 'about', 'contact', 'webshop', 'cart');
 
    echo '<p>
@@ -266,7 +297,7 @@ $menuItemsLogin = array('home', 'about', 'contact', 'webshop', 'cart');
    if (checkSession()){
 
       foreach ($menuItemsLogin as $value){
-      echo '<li><a href="index.php?page='.$value.'">'.$value.'</a></li>';
+      echo '<li><a href="index.php?page='.$value.'">'.$value.'</a></li>'.PHP_EOL;
       }
       echo '<li><a href="index.php?page=logout"> Logout '.$_SESSION["user_name"].' </a></li>
             <li><a href="index.php?page=changepassword"> Wachtwoord veranderen </a></li>';
@@ -282,10 +313,14 @@ $menuItemsLogin = array('home', 'about', 'contact', 'webshop', 'cart');
 
 }
 
+// Toon de footer van de pagina
+
 function showFooter() 
 { 
     echo '<footer> &copy; 2022 Sofie Willemsen </footer>';
 } 
+
+// Eindig html
 
 function endDocument() 
 { 

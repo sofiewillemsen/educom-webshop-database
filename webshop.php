@@ -1,9 +1,13 @@
 <?php
 
+// Laat de titel van de Webshop zien
+
 function showWebshopHeading(){
     echo '<h1>Webshop</h1> <p>Zie hier al mijn mooie tweedehands en vintage kleding! 
     Log in om producten te bestellen.</p>';
 }
+
+// Haal producten uit de database 
 
 function getProducts(){
   $servername = "localhost";
@@ -37,6 +41,8 @@ function getProducts(){
 $conn->close();
 }
 
+/* Laat de producten zien in een tabel met bij elk product de optie om 
+naar de detailpagina te gaan en de optie product te kopen afhankelijk van login */
 
 function showProducts(){
     require_once('index.php');
@@ -67,17 +73,15 @@ function showProducts(){
       .',-';
 
       if (checkSession()){
-         cartButton();
+        require_once('forms.php');
+        openForm('webshop','');
+        echo '<input type="hidden" name="id" value="'.$product['id'].'">';
+        closeForm($submit_caption="Koop");
       }else{
         echo '</td><td><a href="index.php?page=login">Log in</a> om te bestellen.';
     }
     }
 echo '</table>'.PHP_EOL;    
-}
-
-function cartButton(){
-    echo '</td><td>
-         <button type="submit" value="submit">Koop</button>';
 }
 
 ?>

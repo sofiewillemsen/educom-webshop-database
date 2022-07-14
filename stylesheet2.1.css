@@ -9,13 +9,12 @@ p {
   font-size: 12px;
 }
 
-
 header {
   text-align: center;
+  text-align: middle;
   background-color: lightpink;
-  height: 48px;
+  height: 100px;
 }
-
 
 .nav a:link { 
   text-decoration: none;
@@ -32,14 +31,15 @@ header {
 ul.nav {
   list-style-type: none;
   text-align: center;
-  margin: 0;
-  padding: 0;
+  margin: 1px;
+  padding: 1px;
 }
 
 .nav li {
   display: inline-block;
   border: solid;
-  border-width: 1px
+  border-width: 1px;
+  margin-left: 2px;
 }
 
 input {
